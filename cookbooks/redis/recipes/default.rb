@@ -3,8 +3,9 @@
 # Recipe:: default
 #
 
-if ['util'].include?(node[:instance_role])
-  if node[:name] == node[:redis][:utility_name]
+Chef::Log.error node[:environment][:name]
+if ['util', 'solo'].include?(node[:instance_role])
+  if node[:name] == node[:redis][:utility_name] or (node[:instance_role][/solo/] && node[:environment][:name] == node[:redis][:utility_name])
 
     sysctl "Enable Overcommit Memory" do
       variables 'vm.overcommit_memory' => 1

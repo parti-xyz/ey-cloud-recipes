@@ -9,7 +9,7 @@ execute "reload-monit" do
   action :nothing
 end
 
-if util_or_app_server?(node[:sidekiq][:utility_name]) 
+if util_or_app_server?(node[:sidekiq][:utility_name])
   # report to dashboard
   ey_cloud_report "sidekiq" do
     message "Cleaning up sidekiq (if needed)"
