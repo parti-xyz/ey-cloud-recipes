@@ -18,7 +18,7 @@ if util_or_app_server?(node[:sidekiq][:utility_name])
 
   # loop through applications
   node[:applications].each do |app_name, _|
-    next unless(%w(spider canoe).include? app_name)
+    next unless(%w(spider canoe_web).include? app_name)
 
     # reload monit
     execute "restart-sidekiq-for-#{app_name}" do
