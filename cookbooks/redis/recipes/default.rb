@@ -5,7 +5,7 @@
 
 Chef::Log.error node[:environment][:name]
 if ['util', 'solo'].include?(node[:instance_role])
-  if node[:name] == node[:redis][:utility_name] or (node[:instance_role][/solo/] && node[:environment][:name] == node[:redis][:utility_name])
+  if node[:name] == node[:redis][:utility_name] or node[:instance_role] == 'solo'
 
     sysctl "Enable Overcommit Memory" do
       variables 'vm.overcommit_memory' => 1
@@ -58,6 +58,12 @@ if ['util', 'solo'].include?(node[:instance_role])
       bin_path = "/usr/sbin/redis-server"
     end
 
+    execute "Remove existing redis-instance" do
+      command "rm -rf /data/monit.d/redis.monitrc"
+      action :run
+    end
+
+
     template "/data/monit.d/redis_util.monitrc" do
       owner 'root'
       group 'root'
@@ -72,6 +78,7 @@ if ['util', 'solo'].include?(node[:instance_role])
         :bin_path => bin_path
       })
     end
+
 
     execute "monit reload" do
       action :run
