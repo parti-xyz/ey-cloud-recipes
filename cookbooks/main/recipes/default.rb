@@ -1,3 +1,6 @@
+# uncomment to use a custom database.yml configuration
+# include_recipe "database_yml_custom"
+
 #execute "testing" do
 #  command %Q{
 #    echo "i ran at #{Time.now}" >> /root/cheftime
@@ -180,3 +183,9 @@ include_recipe "redis"
 
 #uncomment to install PHP 5.5.x
 #include_recipe "php55"
+
+#uncomment to install PHP 5.6.x
+#include_recipe "php56"
+
+#unncomment to install clamav
+#include_recipe "clamav"

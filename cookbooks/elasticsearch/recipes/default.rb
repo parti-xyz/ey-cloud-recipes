@@ -21,7 +21,7 @@ if ['util'].include?(node[:instance_role])
   if node['name'].include?("elasticsearch_")
     Chef::Log.info "Downloading Elasticsearch v#{node[:elasticsearch_version]} checksum #{node[:elasticsearch_checksum]}"
     remote_file "/tmp/elasticsearch-#{node[:elasticsearch_version]}.zip" do
-      source "http://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-#{node[:elasticsearch_version]}.zip"
+      source "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-#{node[:elasticsearch_version]}.zip"
       mode "0644"
       checksum node[:elasticsearch_checksum]
       not_if { File.exists?("/tmp/elasticsearch-#{node[:elasticsearch_version]}.zip") }
@@ -40,9 +40,11 @@ if ['util'].include?(node[:instance_role])
       unmask true
     end
 
+    # Forcing 'install' because if lower version packages are installed
+    # then 'upgrade' installs the desired version every time it runs.
     package node[:elastic_search_java_package_name] do
       version node[:elasticsearch_java_version]
-      action :upgrade
+      action :install
     end
 
     execute "Set the default Java version to #{node[:elasticsearch_java_version]}" do
@@ -102,11 +104,15 @@ if ['util'].include?(node[:instance_role])
       recursive true
     end
 
-    mount "/usr/lib/elasticsearch-#{node[:elasticsearch_version]}/data" do
-      device "#{node[:elasticsearch_home]}"
-      fstype "none"
-      options "bind,rw"
-      action :mount
+    if File.new("/proc/mounts").readlines.join.match(/\/usr\/lib[0-9]*\/elasticsearch-#{node[:elasticsearch_version]}\/data/)
+      Chef::Log.info("Elastic search bind already complete")
+    else
+      mount "/usr/lib/elasticsearch-#{node[:elasticsearch_version]}/data" do
+        device "#{node[:elasticsearch_home]}"
+        fstype "none"
+        options "bind,rw"
+        action :mount
+      end
     end
 
     template "/usr/lib/elasticsearch-#{node[:elasticsearch_version]}/config/logging.yml" do
@@ -173,15 +179,15 @@ if ['solo','app_master','app','util'].include?(node[:instance_role])
       elasticsearch_hosts << "#{elasticsearch['hostname']}:9200"
     end
 
-    node.engineyard.apps.each do |app|
-      template "/data/#{app.name}/shared/config/elasticsearch.yml" do
+    node[:applications].each do |app_name, data|
+      template "/data/#{app_name}/shared/config/elasticsearch.yml" do
         owner node[:owner_name]
         group node[:owner_name]
         mode 0660
         source "es.yml.erb"
         backup 0
         variables(:yaml_file => {
-          node.engineyard.environment.framework_env => { 
+          node[:environment][:framework_env] => { 
           :hosts => elasticsearch_hosts} })
       end
     end

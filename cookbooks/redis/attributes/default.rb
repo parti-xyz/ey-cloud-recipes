@@ -1,6 +1,6 @@
 default[:redis] = {
   :utility_name => "omelet",
-  :version => "2.8.13",
+  :version => "2.8.13-r1",
   :bindport => "6379",
   :unixsocket => "/tmp/redis.sock",
   :basename => "dump.rdb",

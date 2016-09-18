@@ -26,7 +26,7 @@ if util_or_app_server?(node[:sidekiq][:utility_name])
 
     # reload monit
     execute "restart-sidekiq-for-#{app_name}" do
-      command "monit reload && sleep 1 && monit restart all -g #{app_name}_sidekiq"
+      command "monit reload && sleep 10 && monit restart all -g #{app_name}_sidekiq"
       action :nothing
     end
 
