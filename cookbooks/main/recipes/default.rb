@@ -189,3 +189,5 @@ include_recipe "redis"
 
 #unncomment to install clamav
 #include_recipe "clamav"
+
+include_recipe 'imagemagick'
