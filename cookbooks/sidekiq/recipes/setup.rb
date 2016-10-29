@@ -21,7 +21,7 @@ if util_or_app_server?(node[:sidekiq][:utility_name])
     if node[:environment][:name] == 'omelet'
       next unless(%w(spider canoe_web catan_web hotlinekr bubble).include? app_name)
     elsif node[:environment][:name] == 'omurice'
-      next unless(%w(catan_web hotlinekr bubble).include? app_name)
+      next unless(%w(catan_web hotlinekr bubble govcraft).include? app_name)
     end
 
     # reload monit
